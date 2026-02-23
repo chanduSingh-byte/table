@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Print</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #0a0a0f;
+            --surface: #13131a;
+            --border: #1e1e2e;
+            --accent: #c8f135;
+            --accent-dim: rgba(200, 241, 53, 0.12);
+            --text: #e8e8f0;
+            --muted: #5a5a72;
+            --glow: 0 0 40px rgba(200, 241, 53, 0.15);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        /* Subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 36px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 20px; right: 20px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 36px;
+        }
+
+        .tag {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-dim);
+            border: 1px solid rgba(200, 241, 53, 0.25);
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            letter-spacing: -0.03em;
+            color: var(--text);
+        }
+
+        /* Input area */
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .input-wrap {
+            flex: 1;
+            position: relative;
+        }
+
+        .input-wrap label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            font-family: 'DM Mono', monospace;
+            font-size: 20px;
+            font-weight: 500;
+            padding: 14px 16px;
+            border-radius: 12px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent);
+            box-shadow: var(--glow);
+        }
+
+        input[type="number"]::placeholder {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* Range selector */
+        .range-wrap label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .range-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .range-box span {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--accent);
+            min-width: 28px;
+            text-align: center;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            appearance: none;
+            height: 4px;
+            background: var(--border);
+            border-radius: 999px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--accent);
+            border-radius: 50%;
+            box-shadow: 0 0 8px rgba(200, 241, 53, 0.5);
+            transition: transform 0.15s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+        }
+
+        /* Button */
+        button {
+            width: 100%;
+            background: var(--accent);
+            color: #0a0a0f;
+            font-family: 'Syne', sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s, filter 0.15s;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(200, 241, 53, 0.35);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Output */
+        .output-wrap {
+            position: relative;
+        }
+
+        .output-wrap label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .output-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 280px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .output-box.has-content {
+            border-color: rgba(200, 241, 53, 0.2);
+        }
+
+        .empty-state {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            opacity: 1;
+            transition: opacity 0.2s;
+        }
+
+        .empty-state .icon {
+            font-size: 32px;
+            opacity: 0.4;
+        }
+
+        .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            opacity: 0;
+            transform: translateY(4px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        .rows.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 6px 8px;
+            border-radius: 8px;
+            animation: rowIn 0.25s ease both;
+            font-size: 14px;
+        }
+
+        @keyframes rowIn {
+            from { opacity: 0; transform: translateX(-8px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+
+        .row:hover {
+            background: var(--accent-dim);
+        }
+
+        .row .multiplier {
+            color: var(--muted);
+            min-width: 32px;
+            font-size: 12px;
+        }
+
+        .row .num {
+            color: var(--text);
+            font-weight: 500;
+            min-width: 36px;
+        }
+
+        .row .op {
+            color: var(--muted);
+            margin: 0 6px;
+        }
+
+        .row .factor {
+            color: var(--accent);
+            font-weight: 500;
+            min-width: 28px;
+        }
+
+        .row .eq {
+            color: var(--muted);
+            margin: 0 6px;
+        }
+
+        .row .result {
+            color: var(--text);
+            font-weight: 500;
+            margin-left: auto;
+            text-align: right;
+        }
+
+        /* Error */
+        .error-msg {
+            display: none;
+            font-size: 11px;
+            color: #ff6b6b;
+            letter-spacing: 0.06em;
+            margin-top: 6px;
+        }
+
+        .error-msg.show { display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <span class="tag">Math</span>
+                <h1>Table Print</h1>
+            </div>
+
+            <div class="input-group">
+                <div class="input-wrap">
+                    <label>Number</label>
+                    <input type="number" id="num" placeholder="e.g. 7" />
+                    <span class="error-msg" id="error">Enter a valid number</span>
+                </div>
+                <div class="range-wrap">
+                    <label>Up to</label>
+                    <div class="range-box">
+                        <span id="rangeVal">10</span>
+                        <input type="range" id="limit" min="2" max="100000" value="10" />
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="generateTable()">Generate Table</button>
+
+            <div class="output-wrap">
+                <label>Result</label>
+                <div class="output-box" id="outputBox">
+                    <div class="empty-state" id="emptyState">
+                        <div class="icon">×</div>
+                        <div>awaiting input</div>
+                    </div>
+                    <div class="rows" id="rows"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const numInput   = document.getElementById('num');
+        const limitInput = document.getElementById('limit');
+        const rangeVal   = document.getElementById('rangeVal');
+        const outputBox  = document.getElementById('outputBox');
+        const emptyState = document.getElementById('emptyState');
+        const rowsEl     = document.getElementById('rows');
+        const errorEl    = document.getElementById('error');
+
+        limitInput.addEventListener('input', () => {
+            rangeVal.textContent = limitInput.value;
+        });
+
+        numInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') generateTable();
+        });
+
+        function generateTable() {
+            const raw = numInput.value.trim();
+            const n   = Number(raw);
+
+            if (raw === '' || isNaN(n)) {
+                errorEl.classList.add('show');
+                numInput.focus();
+                return;
+            }
+            errorEl.classList.remove('show');
+
+            const limit = Number(limitInput.value);
+
+            // Clear previous
+            rowsEl.classList.remove('visible');
+            rowsEl.innerHTML = '';
+            emptyState.style.opacity = '0';
+            outputBox.classList.add('has-content');
+
+            setTimeout(() => {
+                for (let i = 1; i <= limit; i++) {
+                    const row = document.createElement('div');
+                    row.className = 'row';
+                    row.style.animationDelay = `${(i - 1) * 30}ms`;
+                    row.innerHTML = `
+                        <span class="multiplier">#${i}</span>
+                        <span class="num">${n}</span>
+                        <span class="op">×</span>
+                        <span class="factor">${i}</span>
+                        <span class="eq">=</span>
+                        <span class="result">${n * i}</span>
+                    `;
+                    rowsEl.appendChild(row);
+                }
+                rowsEl.classList.add('visible');
+            }, 50);
+        }
+    </script>
+</body>
+</html>
